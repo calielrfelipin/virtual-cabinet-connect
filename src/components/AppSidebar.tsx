@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { 
   Home, 
   Users, 
@@ -21,7 +20,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -35,9 +33,10 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
+  const collapsed = state === "collapsed";
 
   const isActive = (path: string) => {
     if (path === "/" && currentPath === "/") return true;
@@ -52,8 +51,8 @@ export function AppSidebar() {
 
   return (
     <Sidebar
-      className={`${collapsed ? "w-14" : "w-64"} border-r border-gov-gray-200 bg-white`}
-      collapsible
+      className={`${collapsed ? "w-16" : "w-64"} border-r border-gov-gray-200 bg-white`}
+      collapsible="icon"
     >
       <div className="p-4 border-b border-gov-gray-200">
         <div className="flex items-center gap-3">

@@ -7,63 +7,81 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Plus, 
   Search, 
-  Filter, 
+  Users, 
   MapPin, 
   Phone, 
-  Mail, 
-  Calendar,
-  Users,
-  Map
+  Mail,
+  Filter,
+  Download
 } from "lucide-react";
-
-const mockCidadaos = [
-  {
-    id: 1,
-    nome: "Maria Silva Santos",
-    endereco: "Rua das Flores, 123 - Centro",
-    telefone: "(11) 99999-9999",
-    email: "maria.silva@email.com",
-    idade: 45,
-    genero: "Feminino",
-    recebe_informativos: true,
-    multiplicador: false,
-    bairro: "Centro"
-  },
-  {
-    id: 2,
-    nome: "João Pedro Oliveira",
-    endereco: "Av. Principal, 456 - Jardim América",
-    telefone: "(11) 88888-8888",
-    email: "joao.pedro@email.com",
-    idade: 32,
-    genero: "Masculino",
-    recebe_informativos: true,
-    multiplicador: true,
-    bairro: "Jardim América"
-  },
-  {
-    id: 3,
-    nome: "Ana Carolina Costa",
-    endereco: "Rua do Comércio, 789 - Vila Nova",
-    telefone: "(11) 77777-7777",
-    email: "ana.costa@email.com",
-    idade: 28,
-    genero: "Feminino",
-    recebe_informativos: false,
-    multiplicador: true,
-    bairro: "Vila Nova"
-  }
-];
+import { CidadaoForm } from "@/components/forms/CidadaoForm";
 
 export default function Cidadaos() {
+  const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const [cidadaos, setCidadaos] = useState([
+    {
+      id: 1,
+      nome: "Maria Silva Santos",
+      endereco: "Rua das Flores, 123 - Centro",
+      telefone: "(11) 99999-1111",
+      email: "maria.silva@email.com",
+      genero: "Feminino",
+      recebeInformativos: true,
+      multiplicador: false
+    },
+    {
+      id: 2,
+      nome: "João Paulo Oliveira",
+      endereco: "Av. Principal, 456 - Jardim São José",
+      telefone: "(11) 99999-2222",
+      email: "joao.paulo@email.com",
+      genero: "Masculino",
+      recebeInformativos: true,
+      multiplicador: true
+    }
+  ]);
 
-  const filteredCidadaos = mockCidadaos.filter(cidadao =>
+  const handleSaveCidadao = (data: any) => {
+    const newCidadao = {
+      id: cidadaos.length + 1,
+      ...data,
+      recebeInformativos: data.recebeInformativos === "sim",
+      multiplicador: data.multiplicador === "sim"
+    };
+    setCidadaos([...cidadaos, newCidadao]);
+  };
+
+  const filteredCidadaos = cidadaos.filter(cidadao =>
     cidadao.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cidadao.endereco.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cidadao.bairro.toLowerCase().includes(searchTerm.toLowerCase())
+    cidadao.endereco.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (showForm) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gov-gray-900">Cidadãos</h1>
+            <p className="text-gov-gray-500 mt-1">Cadastro e gerenciamento de cidadãos</p>
+          </div>
+          <Button 
+            variant="outline" 
+            onClick={() => setShowForm(false)}
+          >
+            Voltar à Lista
+          </Button>
+        </div>
+
+        <div className="flex justify-center">
+          <CidadaoForm 
+            onClose={() => setShowForm(false)}
+            onSave={handleSaveCidadao}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -71,40 +89,42 @@ export default function Cidadaos() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gov-gray-900">Cidadãos</h1>
-          <p className="text-gov-gray-500 mt-1">Gerencie o cadastro de cidadãos do seu município</p>
+          <p className="text-gov-gray-500 mt-1">Cadastro e gerenciamento de cidadãos</p>
         </div>
-        
-        <Button className="gap-2 bg-gradient-gov hover:opacity-90">
+        <Button 
+          onClick={() => setShowForm(true)}
+          className="gap-2"
+        >
           <Plus className="w-4 h-4" />
-          Novo Cidadão
+          Cadastrar Cidadão
         </Button>
       </div>
 
-      {/* Stats and Controls */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="gov-card">
-          <CardContent className="pt-6">
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                <Users className="w-5 h-5 text-blue-600" />
+              <div className="w-12 h-12 bg-gov-accent-100 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-gov-accent-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gov-gray-900">{mockCidadaos.length}</p>
+                <p className="text-2xl font-bold text-gov-gray-900">{cidadaos.length}</p>
                 <p className="text-sm text-gov-gray-500">Total de Cidadãos</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="gov-card">
-          <CardContent className="pt-6">
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                <Mail className="w-5 h-5 text-green-600" />
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <Mail className="w-6 h-6 text-green-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gov-gray-900">
-                  {mockCidadaos.filter(c => c.recebe_informativos).length}
+                  {cidadaos.filter(c => c.recebeInformativos).length}
                 </p>
                 <p className="text-sm text-gov-gray-500">Recebem Informativos</p>
               </div>
@@ -112,15 +132,15 @@ export default function Cidadaos() {
           </CardContent>
         </Card>
 
-        <Card className="gov-card">
-          <CardContent className="pt-6">
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
-                <Users className="w-5 h-5 text-purple-600" />
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-purple-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gov-gray-900">
-                  {mockCidadaos.filter(c => c.multiplicador).length}
+                  {cidadaos.filter(c => c.multiplicador).length}
                 </p>
                 <p className="text-sm text-gov-gray-500">Multiplicadores</p>
               </div>
@@ -128,137 +148,134 @@ export default function Cidadaos() {
           </CardContent>
         </Card>
 
-        <Card className="gov-card">
-          <CardContent className="pt-6">
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-orange-600" />
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-orange-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gov-gray-900">
-                  {new Set(mockCidadaos.map(c => c.bairro)).size}
-                </p>
-                <p className="text-sm text-gov-gray-500">Bairros</p>
+                <p className="text-2xl font-bold text-gov-gray-900">8</p>
+                <p className="text-sm text-gov-gray-500">Bairros Atendidos</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Search and Filters */}
-      <Card className="gov-card">
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="flex items-center gap-4 flex-1">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gov-gray-400 w-4 h-4" />
-                <Input 
-                  placeholder="Buscar por nome, endereço ou bairro..." 
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+      {/* Filters and Search */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gov-gray-400 w-4 h-4" />
+              <Input 
+                placeholder="Buscar por nome ou endereço..." 
+                className="pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
               <Button variant="outline" className="gap-2">
                 <Filter className="w-4 h-4" />
                 Filtros
               </Button>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button 
-                variant={viewMode === "list" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-              >
-                Lista
-              </Button>
-              <Button 
-                variant={viewMode === "map" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("map")}
-                className="gap-2"
-              >
-                <Map className="w-4 h-4" />
-                Mapa
+              <Button variant="outline" className="gap-2">
+                <Download className="w-4 h-4" />
+                Exportar
               </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Content */}
-      {viewMode === "list" ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredCidadaos.map((cidadao) => (
-            <Card key={cidadao.id} className="gov-card hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg text-gov-gray-900">
-                      {cidadao.nome}
-                    </CardTitle>
-                    <CardDescription className="flex items-center gap-1 mt-1">
-                      <MapPin className="w-3 h-3" />
-                      {cidadao.endereco}
-                    </CardDescription>
+      {/* Lista de Cidadãos */}
+      <div className="grid gap-4">
+        {filteredCidadaos.map((cidadao) => (
+          <Card key={cidadao.id} className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gradient-gov rounded-full flex items-center justify-center">
+                      <span className="text-white font-medium">
+                        {cidadao.nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      </span>
+                    </div>
+                    
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-semibold text-gov-gray-900">{cidadao.nome}</h3>
+                        <div className="flex gap-1">
+                          {cidadao.recebeInformativos && (
+                            <Badge variant="secondary" className="text-xs">
+                              Recebe Informativos
+                            </Badge>
+                          )}
+                          {cidadao.multiplicador && (
+                            <Badge className="text-xs bg-purple-100 text-purple-700">
+                              Multiplicador
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-1 text-sm text-gov-gray-600">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4" />
+                          <span>{cidadao.endereco}</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <Phone className="w-4 h-4" />
+                            <span>{cidadao.telefone}</span>
+                          </div>
+                          {cidadao.email && (
+                            <div className="flex items-center gap-2">
+                              <Mail className="w-4 h-4" />
+                              <span>{cidadao.email}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    {cidadao.multiplicador && (
-                      <Badge variant="secondary" className="text-xs">
-                        Multiplicador
-                      </Badge>
-                    )}
-                    {cidadao.recebe_informativos && (
-                      <Badge variant="outline" className="text-xs">
-                        Informativos
-                      </Badge>
-                    )}
-                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-2 text-sm text-gov-gray-600">
-                  <Phone className="w-4 h-4" />
-                  {cidadao.telefone}
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gov-gray-600">
-                  <Mail className="w-4 h-4" />
-                  {cidadao.email}
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gov-gray-600">
-                  <Calendar className="w-4 h-4" />
-                  {cidadao.idade} anos • {cidadao.genero}
-                </div>
-                <div className="pt-3 border-t">
-                  <Button variant="outline" size="sm" className="w-full">
-                    Ver Detalhes
+                
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    Editar
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-gov-gray-500">
+                    Ver Mais
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <Card className="gov-card">
-          <CardHeader>
-            <CardTitle className="text-gov-gray-900">Mapa de Cidadãos</CardTitle>
-            <CardDescription>Visualização geográfica dos cidadãos cadastrados</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-96 bg-gradient-subtle rounded-lg flex items-center justify-center border-2 border-dashed border-gov-gray-300">
-              <div className="text-center">
-                <Map className="w-16 h-16 text-gov-gray-400 mx-auto mb-4" />
-                <p className="text-gov-gray-500 font-medium text-lg">Mapa Interativo de Cidadãos</p>
-                <p className="text-sm text-gov-gray-400 mt-2 max-w-md">
-                  Aqui será exibido o mapa com a localização de todos os cidadãos cadastrados. 
-                  Configure a API do Google Maps para ativar esta funcionalidade.
-                </p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        ))}
+
+        {filteredCidadaos.length === 0 && (
+          <Card>
+            <CardContent className="p-12 text-center">
+              <Users className="w-12 h-12 text-gov-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gov-gray-900 mb-2">
+                Nenhum cidadão encontrado
+              </h3>
+              <p className="text-gov-gray-500 mb-4">
+                {searchTerm ? "Tente ajustar os filtros de busca" : "Comece cadastrando o primeiro cidadão"}
+              </p>
+              {!searchTerm && (
+                <Button onClick={() => setShowForm(true)} className="gap-2">
+                  <Plus className="w-4 h-4" />
+                  Cadastrar Primeiro Cidadão
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
