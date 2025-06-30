@@ -1,8 +1,9 @@
-
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { 
   Plus, 
   Phone, 
@@ -11,8 +12,9 @@ import {
   User,
   Settings
 } from "lucide-react";
+import { EquipeForm } from "@/components/forms/EquipeForm";
 
-const mockEquipe = [
+const mockEquipeInitial = [
   {
     id: 1,
     nome: "Carlos Eduardo Silva",
@@ -43,6 +45,23 @@ const mockEquipe = [
 ];
 
 export default function Equipe() {
+  const [showForm, setShowForm] = useState(false);
+  const [equipe, setEquipe] = useState(mockEquipeInitial);
+
+  const handleSaveMembro = (novoMembro: any) => {
+    const membroComId = {
+      ...novoMembro,
+      id: Date.now(),
+      acesso_sistema: novoMembro.acessoSistema,
+      permissoes: novoMembro.acessoSistema ? 
+        Object.entries(novoMembro.permissoes)
+          .filter(([key, value]) => value)
+          .map(([key, value]) => key.replace(/([A-Z])/g, ' $1').trim()) 
+        : []
+    };
+    setEquipe(prev => [...prev, membroComId]);
+  };
+
   const getInitials = (nome: string) => {
     return nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
@@ -52,11 +71,14 @@ export default function Equipe() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gov-gray-900">Equipe</h1>
-          <p className="text-gov-gray-500 mt-1">Gerencie os membros da sua equipe e suas permissões</p>
+          <h1 className="text-3xl font-bold text-slate-900">Equipe</h1>
+          <p className="text-slate-500 mt-1">Gerencie os membros da sua equipe e suas permissões</p>
         </div>
         
-        <Button className="gap-2 bg-gradient-gov hover:opacity-90">
+        <Button 
+          onClick={() => setShowForm(true)}
+          className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+        >
           <Plus className="w-4 h-4" />
           Novo Membro
         </Button>
@@ -64,47 +86,47 @@ export default function Equipe() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="gov-card">
+        <Card className="bg-white border border-slate-200">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
                 <User className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gov-gray-900">{mockEquipe.length}</p>
-                <p className="text-sm text-gov-gray-500">Total de Membros</p>
+                <p className="text-2xl font-bold text-slate-900">{equipe.length}</p>
+                <p className="text-sm text-slate-500">Total de Membros</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="gov-card">
+        <Card className="bg-white border border-slate-200">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
                 <Shield className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gov-gray-900">
-                  {mockEquipe.filter(m => m.acesso_sistema).length}
+                <p className="text-2xl font-bold text-slate-900">
+                  {equipe.filter(m => m.acesso_sistema).length}
                 </p>
-                <p className="text-sm text-gov-gray-500">Com Acesso ao Sistema</p>
+                <p className="text-sm text-slate-500">Com Acesso ao Sistema</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="gov-card">
+        <Card className="bg-white border border-slate-200">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
                 <Settings className="w-5 h-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gov-gray-900">
-                  {mockEquipe.filter(m => m.permissoes.includes("Administrador")).length}
+                <p className="text-2xl font-bold text-slate-900">
+                  {equipe.filter(m => m.permissoes.includes("Administrador")).length}
                 </p>
-                <p className="text-sm text-gov-gray-500">Administradores</p>
+                <p className="text-sm text-slate-500">Administradores</p>
               </div>
             </div>
           </CardContent>
@@ -113,12 +135,12 @@ export default function Equipe() {
 
       {/* Team Members */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {mockEquipe.map((membro) => (
-          <Card key={membro.id} className="gov-card hover:shadow-md transition-shadow">
+        {equipe.map((membro) => (
+          <Card key={membro.id} className="bg-white border border-slate-200 hover:shadow-md transition-shadow">
             <CardHeader className="pb-4">
               <div className="flex items-start gap-4">
                 <Avatar className="w-12 h-12">
-                  <AvatarFallback className="bg-gradient-gov text-white font-semibold">
+                  <AvatarFallback className="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold">
                     {getInitials(membro.nome)}
                   </AvatarFallback>
                 </Avatar>
@@ -126,10 +148,10 @@ export default function Equipe() {
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-lg text-gov-gray-900">
+                      <CardTitle className="text-lg text-slate-900">
                         {membro.nome}
                       </CardTitle>
-                      <CardDescription className="text-gov-gray-500 font-medium">
+                      <CardDescription className="text-slate-500 font-medium">
                         {membro.cargo}
                       </CardDescription>
                     </div>
@@ -140,7 +162,7 @@ export default function Equipe() {
                           Acesso Ativo
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-gov-gray-500">
+                        <Badge variant="outline" className="text-slate-500">
                           Sem Acesso
                         </Badge>
                       )}
@@ -152,11 +174,11 @@ export default function Equipe() {
             
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-gov-gray-600">
+                <div className="flex items-center gap-2 text-sm text-slate-600">
                   <Phone className="w-4 h-4" />
                   {membro.telefone}
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gov-gray-600">
+                <div className="flex items-center gap-2 text-sm text-slate-600">
                   <Mail className="w-4 h-4" />
                   {membro.email}
                 </div>
@@ -164,7 +186,7 @@ export default function Equipe() {
 
               {membro.permissoes.length > 0 && (
                 <div>
-                  <p className="text-sm font-medium text-gov-gray-700 mb-2">Permissões:</p>
+                  <p className="text-sm font-medium text-slate-700 mb-2">Permissões:</p>
                   <div className="flex flex-wrap gap-1">
                     {membro.permissoes.map((permissao, index) => (
                       <Badge key={index} variant="outline" className="text-xs">
@@ -189,9 +211,9 @@ export default function Equipe() {
       </div>
 
       {/* Permissions Info */}
-      <Card className="gov-card">
+      <Card className="bg-white border border-slate-200">
         <CardHeader>
-          <CardTitle className="text-gov-gray-900">Níveis de Permissão</CardTitle>
+          <CardTitle className="text-slate-900">Níveis de Permissão</CardTitle>
           <CardDescription>Entenda os diferentes tipos de acesso no sistema</CardDescription>
         </CardHeader>
         <CardContent>
@@ -215,6 +237,16 @@ export default function Equipe() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Dialog do Formulário */}
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <EquipeForm 
+            onClose={() => setShowForm(false)}
+            onSave={handleSaveMembro}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -6,22 +6,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Palette, Save } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
+import { toast } from "sonner";
 
 const coresPredefinidas = [
-  { nome: "Azul Governo", primaria: "#006fd6", secundaria: "#f1f5f9" },
+  { nome: "Azul Governo", primaria: "#3b82f6", secundaria: "#f1f5f9" },
   { nome: "Verde Sustentável", primaria: "#10b981", secundaria: "#f0fdf4" },
   { nome: "Roxo Moderno", primaria: "#8b5cf6", secundaria: "#faf5ff" },
   { nome: "Vermelho Ativo", primaria: "#ef4444", secundaria: "#fef2f2" },
+  { nome: "Cinza Neutro", primaria: "#6b7280", secundaria: "#f9fafb" },
+  { nome: "Índigo Profissional", primaria: "#4f46e5", secundaria: "#eef2ff" },
 ];
 
 export default function ColorPalette() {
-  const [corPrimaria, setCorPrimaria] = useState("#006fd6");
-  const [corSecundaria, setCorSecundaria] = useState("#f1f5f9");
+  const { primaryColor, secondaryColor, updateColors } = useTheme();
+  const [corPrimaria, setCorPrimaria] = useState(primaryColor);
+  const [corSecundaria, setCorSecundaria] = useState(secondaryColor);
+
+  const handleSave = () => {
+    updateColors(corPrimaria, corSecundaria);
+    toast.success("Cores atualizadas com sucesso!");
+  };
+
+  const aplicarPaleta = (paleta: { primaria: string; secundaria: string }) => {
+    setCorPrimaria(paleta.primaria);
+    setCorSecundaria(paleta.secundaria);
+  };
 
   return (
     <Card className="gov-card">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-gov-gray-900">
+        <CardTitle className="flex items-center gap-2 text-slate-900">
           <Palette className="w-5 h-5" />
           Cores da Interface
         </CardTitle>
@@ -45,7 +60,7 @@ export default function ColorPalette() {
               <Input
                 value={corPrimaria}
                 onChange={(e) => setCorPrimaria(e.target.value)}
-                placeholder="#006fd6"
+                placeholder="#3b82f6"
                 className="flex-1"
               />
             </div>
@@ -73,22 +88,19 @@ export default function ColorPalette() {
 
         {/* Paletas Predefinidas */}
         <div>
-          <Label className="text-sm font-medium text-gov-gray-700 mb-3 block">
+          <Label className="text-sm font-medium text-slate-700 mb-3 block">
             Paletas Predefinidas
           </Label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {coresPredefinidas.map((paleta, index) => (
               <div
                 key={index}
-                className="p-3 border border-gov-gray-200 rounded-lg cursor-pointer hover:border-gov-blue-300 transition-colors"
-                onClick={() => {
-                  setCorPrimaria(paleta.primaria);
-                  setCorSecundaria(paleta.secundaria);
-                }}
+                className="p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-blue-300 transition-colors"
+                onClick={() => aplicarPaleta(paleta)}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-gov-gray-900">{paleta.nome}</p>
+                    <p className="font-medium text-slate-900">{paleta.nome}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <div 
                         className="w-4 h-4 rounded border"
@@ -112,17 +124,17 @@ export default function ColorPalette() {
         </div>
 
         {/* Preview */}
-        <div className="p-4 border-2 border-dashed border-gov-gray-300 rounded-lg">
-          <p className="text-sm text-gov-gray-500 mb-3">Preview das cores:</p>
+        <div className="p-4 border-2 border-dashed border-slate-300 rounded-lg">
+          <p className="text-sm text-slate-500 mb-3">Preview das cores:</p>
           <div className="flex items-center gap-4">
             <div 
-              className="w-16 h-10 rounded flex items-center justify-center text-white font-medium"
+              className="w-16 h-10 rounded flex items-center justify-center text-white font-medium text-xs"
               style={{ backgroundColor: corPrimaria }}
             >
               Primária
             </div>
             <div 
-              className="w-16 h-10 rounded flex items-center justify-center border"
+              className="w-16 h-10 rounded flex items-center justify-center border text-xs"
               style={{ backgroundColor: corSecundaria }}
             >
               <span style={{ color: corPrimaria }}>Sec.</span>
@@ -130,7 +142,7 @@ export default function ColorPalette() {
           </div>
         </div>
 
-        <Button className="gap-2">
+        <Button onClick={handleSave} className="gap-2">
           <Save className="w-4 h-4" />
           Salvar Configurações
         </Button>

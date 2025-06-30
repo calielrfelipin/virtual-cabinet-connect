@@ -45,6 +45,10 @@
     --sidebar-accent-foreground: 55 65 81;
     --sidebar-border: 229 231 235;
     --sidebar-ring: 59 130 246;
+
+    /* Variáveis para cores personalizadas */
+    --color-primary: #3b82f6;
+    --color-secondary: #f1f5f9;
   }
 
   .dark {
@@ -97,11 +101,11 @@
   }
 
   .gov-gradient {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    background: var(--color-primary);
   }
 
   .gov-card {
-    @apply bg-white border border-gov-gray-200 rounded-lg shadow-sm;
+    @apply bg-white border border-slate-200 rounded-lg shadow-sm;
   }
 }
 
