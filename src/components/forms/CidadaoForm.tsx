@@ -8,13 +8,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Save, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface CidadaoFormProps {
   onClose: () => void;
-  onSave: (data: any) => void;
+  onSave: () => void;
 }
 
 export function CidadaoForm({ onClose, onSave }: CidadaoFormProps) {
+  const { vereadorId } = useAuth();
   const [formData, setFormData] = useState({
     nome: "",
     endereco: "",
@@ -22,12 +25,13 @@ export function CidadaoForm({ onClose, onSave }: CidadaoFormProps) {
     email: "",
     dataNascimento: "",
     genero: "",
-    recebeInformativos: "sim",
-    multiplicador: "nao",
+    recebeInformativos: true,
+    multiplicador: false,
     observacoes: ""
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.nome || !formData.endereco || !formData.telefone) {
@@ -35,20 +39,54 @@ export function CidadaoForm({ onClose, onSave }: CidadaoFormProps) {
       return;
     }
 
-    console.log("Dados do cidadão:", formData);
-    onSave(formData);
-    toast.success("Cidadão cadastrado com sucesso!");
-    onClose();
+    if (!vereadorId) {
+      toast.error("Erro: usuário não identificado");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('cidadaos')
+        .insert({
+          vereador_id: vereadorId,
+          nome: formData.nome,
+          endereco: formData.endereco,
+          telefone: formData.telefone,
+          email: formData.email || null,
+          data_nascimento: formData.dataNascimento || null,
+          genero: formData.genero || null,
+          recebe_informativos: formData.recebeInformativos,
+          multiplicador: formData.multiplicador,
+          observacoes: formData.observacoes || null
+        });
+
+      if (error) {
+        console.error('Error inserting cidadao:', error);
+        toast.error("Erro ao cadastrar cidadão");
+        return;
+      }
+
+      toast.success("Cidadão cadastrado com sucesso!");
+      onSave();
+      onClose();
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Erro ao cadastrar cidadão");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-gov-gray-900">Cadastrar Cidadão</CardTitle>
+        <CardTitle className="text-slate-900">Cadastrar Cidadão</CardTitle>
         <Button variant="ghost" size="sm" onClick={onClose}>
           <X className="w-4 h-4" />
         </Button>
@@ -132,7 +170,10 @@ export function CidadaoForm({ onClose, onSave }: CidadaoFormProps) {
 
             <div className="space-y-2">
               <Label htmlFor="recebeInformativos">Recebe Informativos?</Label>
-              <Select value={formData.recebeInformativos} onValueChange={(value) => handleChange("recebeInformativos", value)}>
+              <Select 
+                value={formData.recebeInformativos ? "sim" : "nao"} 
+                onValueChange={(value) => handleChange("recebeInformativos", value === "sim")}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -145,7 +186,10 @@ export function CidadaoForm({ onClose, onSave }: CidadaoFormProps) {
 
             <div className="space-y-2">
               <Label htmlFor="multiplicador">É Multiplicador?</Label>
-              <Select value={formData.multiplicador} onValueChange={(value) => handleChange("multiplicador", value)}>
+              <Select 
+                value={formData.multiplicador ? "sim" : "nao"} 
+                onValueChange={(value) => handleChange("multiplicador", value === "sim")}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -169,9 +213,9 @@ export function CidadaoForm({ onClose, onSave }: CidadaoFormProps) {
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button type="submit" className="gap-2">
+            <Button type="submit" className="gap-2" disabled={isLoading}>
               <Save className="w-4 h-4" />
-              Salvar Cidadão
+              {isLoading ? "Salvando..." : "Salvar Cidadão"}
             </Button>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar

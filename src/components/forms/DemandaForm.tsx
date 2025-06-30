@@ -8,23 +8,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Save, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface DemandaFormProps {
   onClose: () => void;
-  onSave: (data: any) => void;
+  onSave: () => void;
 }
 
 export function DemandaForm({ onClose, onSave }: DemandaFormProps) {
+  const { vereadorId } = useAuth();
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
     categoria: "",
     status: "nova",
-    localizacao: "",
-    cidadaoVinculado: ""
+    prioridade: "media",
+    endereco: ""
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.titulo || !formData.descricao || !formData.categoria) {
@@ -32,10 +36,41 @@ export function DemandaForm({ onClose, onSave }: DemandaFormProps) {
       return;
     }
 
-    console.log("Dados da demanda:", formData);
-    onSave(formData);
-    toast.success("Demanda cadastrada com sucesso!");
-    onClose();
+    if (!vereadorId) {
+      toast.error("Erro: usuário não identificado");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('demandas')
+        .insert({
+          vereador_id: vereadorId,
+          titulo: formData.titulo,
+          descricao: formData.descricao,
+          categoria: formData.categoria,
+          status: formData.status,
+          prioridade: formData.prioridade,
+          endereco: formData.endereco || null
+        });
+
+      if (error) {
+        console.error('Error inserting demanda:', error);
+        toast.error("Erro ao cadastrar demanda");
+        return;
+      }
+
+      toast.success("Demanda cadastrada com sucesso!");
+      onSave();
+      onClose();
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Erro ao cadastrar demanda");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (field: string, value: string) => {
@@ -45,7 +80,7 @@ export function DemandaForm({ onClose, onSave }: DemandaFormProps) {
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-gov-gray-900">Cadastrar Demanda</CardTitle>
+        <CardTitle className="text-slate-900">Cadastrar Demanda</CardTitle>
         <Button variant="ghost" size="sm" onClick={onClose}>
           <X className="w-4 h-4" />
         </Button>
@@ -76,7 +111,7 @@ export function DemandaForm({ onClose, onSave }: DemandaFormProps) {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="categoria">Categoria *</Label>
               <Select value={formData.categoria} onValueChange={(value) => handleChange("categoria", value)}>
@@ -109,32 +144,36 @@ export function DemandaForm({ onClose, onSave }: DemandaFormProps) {
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="prioridade">Prioridade</Label>
+              <Select value={formData.prioridade} onValueChange={(value) => handleChange("prioridade", value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="baixa">Baixa</SelectItem>
+                  <SelectItem value="media">Média</SelectItem>
+                  <SelectItem value="alta">Alta</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="localizacao">Localização</Label>
+            <Label htmlFor="endereco">Localização</Label>
             <Input
-              id="localizacao"
-              value={formData.localizacao}
-              onChange={(e) => handleChange("localizacao", e.target.value)}
+              id="endereco"
+              value={formData.endereco}
+              onChange={(e) => handleChange("endereco", e.target.value)}
               placeholder="Endereço ou ponto de referência"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="cidadaoVinculado">Cidadão Vinculado</Label>
-            <Input
-              id="cidadaoVinculado"
-              value={formData.cidadaoVinculado}
-              onChange={(e) => handleChange("cidadaoVinculado", e.target.value)}
-              placeholder="Nome do cidadão que reportou"
-            />
-          </div>
-
           <div className="flex gap-3 pt-4">
-            <Button type="submit" className="gap-2">
+            <Button type="submit" className="gap-2" disabled={isLoading}>
               <Save className="w-4 h-4" />
-              Salvar Demanda
+              {isLoading ? "Salvando..." : "Salvar Demanda"}
             </Button>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar

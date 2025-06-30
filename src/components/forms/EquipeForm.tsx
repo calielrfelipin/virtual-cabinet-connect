@@ -3,18 +3,20 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Save, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface EquipeFormProps {
   onClose: () => void;
-  onSave: (data: any) => void;
+  onSave: () => void;
 }
 
 export function EquipeForm({ onClose, onSave }: EquipeFormProps) {
+  const { vereadorId } = useAuth();
   const [formData, setFormData] = useState({
     nome: "",
     cargo: "",
@@ -29,8 +31,9 @@ export function EquipeForm({ onClose, onSave }: EquipeFormProps) {
       visualizarRelatorios: false
     }
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.nome || !formData.cargo || !formData.telefone) {
@@ -38,10 +41,47 @@ export function EquipeForm({ onClose, onSave }: EquipeFormProps) {
       return;
     }
 
-    console.log("Dados do membro da equipe:", formData);
-    onSave(formData);
-    toast.success("Membro da equipe cadastrado com sucesso!");
-    onClose();
+    if (!vereadorId) {
+      toast.error("Erro: usuário não identificado");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const permissoesArray = formData.acessoSistema 
+        ? Object.entries(formData.permissoes)
+            .filter(([_, value]) => value)
+            .map(([key, _]) => key)
+        : [];
+
+      const { error } = await supabase
+        .from('equipe')
+        .insert({
+          vereador_id: vereadorId,
+          nome: formData.nome,
+          cargo: formData.cargo,
+          telefone: formData.telefone,
+          email: formData.email || null,
+          acesso_sistema: formData.acessoSistema,
+          permissoes: permissoesArray
+        });
+
+      if (error) {
+        console.error('Error inserting equipe:', error);
+        toast.error("Erro ao cadastrar membro da equipe");
+        return;
+      }
+
+      toast.success("Membro da equipe cadastrado com sucesso!");
+      onSave();
+      onClose();
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Erro ao cadastrar membro da equipe");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (field: string, value: string | boolean) => {
@@ -61,7 +101,7 @@ export function EquipeForm({ onClose, onSave }: EquipeFormProps) {
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-gov-gray-900">Cadastrar Membro da Equipe</CardTitle>
+        <CardTitle className="text-slate-900">Cadastrar Membro da Equipe</CardTitle>
         <Button variant="ghost" size="sm" onClick={onClose}>
           <X className="w-4 h-4" />
         </Button>
@@ -128,7 +168,7 @@ export function EquipeForm({ onClose, onSave }: EquipeFormProps) {
             </div>
 
             {formData.acessoSistema && (
-              <div className="space-y-3 p-4 bg-gov-gray-50 rounded-lg">
+              <div className="space-y-3 p-4 bg-slate-50 rounded-lg">
                 <Label className="text-sm font-medium">Permissões de Acesso:</Label>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -182,9 +222,9 @@ export function EquipeForm({ onClose, onSave }: EquipeFormProps) {
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button type="submit" className="gap-2">
+            <Button type="submit" className="gap-2" disabled={isLoading}>
               <Save className="w-4 h-4" />
-              Salvar Membro
+              {isLoading ? "Salvando..." : "Salvar Membro"}
             </Button>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
