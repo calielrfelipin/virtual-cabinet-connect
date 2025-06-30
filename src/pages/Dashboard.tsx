@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, MapPin, FileText, TrendingUp, Plus, Calendar } from "lucide-react";
+import { Users, MapPin, FileText, TrendingUp, Calendar } from "lucide-react";
 
 const stats = [
   {
@@ -73,10 +73,6 @@ export default function Dashboard() {
           <Button variant="outline" className="gap-2">
             <Calendar className="w-4 h-4" />
             Hoje
-          </Button>
-          <Button className="gap-2 bg-gradient-gov hover:opacity-90">
-            <Plus className="w-4 h-4" />
-            Nova Demanda
           </Button>
         </div>
       </div>

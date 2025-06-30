@@ -10,7 +10,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [primaryColor, setPrimaryColor] = useState("#3b82f6");
+  const [primaryColor, setPrimaryColor] = useState("#64748b");
   const [secondaryColor, setSecondaryColor] = useState("#f1f5f9");
 
   const updateColors = (primary: string, secondary: string) => {
