@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface CidadaoFormProps {
   onClose: () => void;
-  onSave: () => void;
+  onSave: (data: any) => void;
 }
 
 export function CidadaoForm({ onClose, onSave }: CidadaoFormProps) {

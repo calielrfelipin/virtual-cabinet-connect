@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface EquipeFormProps {
   onClose: () => void;
-  onSave: () => void;
+  onSave: (data: any) => void;
 }
 
 export function EquipeForm({ onClose, onSave }: EquipeFormProps) {
