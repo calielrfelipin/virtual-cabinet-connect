@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface CidadaoFormProps {
   onClose: () => void;
-  onSave: (data: any) => void;
+  onSave: () => void;
 }
 
 export function CidadaoForm({ onClose, onSave }: CidadaoFormProps) {

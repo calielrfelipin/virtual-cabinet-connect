@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface EquipeFormProps {
   onClose: () => void;
-  onSave: (data: any) => void;
+  onSave: () => void;
 }
 
 export function EquipeForm({ onClose, onSave }: EquipeFormProps) {

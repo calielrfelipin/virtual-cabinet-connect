@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface DemandaFormProps {
   onClose: () => void;
-  onSave: (data: any) => void;
+  onSave: () => void;
 }
 
 export function DemandaForm({ onClose, onSave }: DemandaFormProps) {
