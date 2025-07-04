@@ -10,12 +10,12 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
 
 const coresPredefinidas = [
-  { nome: "Cinza Neutro", primaria: "#64748b", secundaria: "#f1f5f9" },
   { nome: "Azul Governo", primaria: "#3b82f6", secundaria: "#f1f5f9" },
+  { nome: "Azul Escuro", primaria: "#1d4ed8", secundaria: "#eff6ff" },
   { nome: "Verde Sustentável", primaria: "#10b981", secundaria: "#f0fdf4" },
-  { nome: "Roxo Moderno", primaria: "#8b5cf6", secundaria: "#faf5ff" },
-  { nome: "Vermelho Ativo", primaria: "#ef4444", secundaria: "#fef2f2" },
   { nome: "Índigo Profissional", primaria: "#4f46e5", secundaria: "#eef2ff" },
+  { nome: "Cinza Neutro", primaria: "#64748b", secundaria: "#f8fafc" },
+  { nome: "Roxo Moderno", primaria: "#8b5cf6", secundaria: "#faf5ff" },
 ];
 
 export default function ColorPalette() {
@@ -60,7 +60,7 @@ export default function ColorPalette() {
               <Input
                 value={corPrimaria}
                 onChange={(e) => setCorPrimaria(e.target.value)}
-                placeholder="#64748b"
+                placeholder="#3b82f6"
                 className="flex-1"
               />
             </div>

@@ -10,7 +10,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [primaryColor, setPrimaryColor] = useState("#64748b");
+  const [primaryColor, setPrimaryColor] = useState("#3b82f6");
   const [secondaryColor, setSecondaryColor] = useState("#f1f5f9");
 
   const updateColors = (primary: string, secondary: string) => {
@@ -31,6 +31,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (savedColors) {
       const { primary, secondary } = JSON.parse(savedColors);
       updateColors(primary, secondary);
+    } else {
+      // Aplicar cores padrão na primeira carga
+      document.documentElement.style.setProperty('--color-primary', primaryColor);
+      document.documentElement.style.setProperty('--color-secondary', secondaryColor);
     }
   }, []);
 
