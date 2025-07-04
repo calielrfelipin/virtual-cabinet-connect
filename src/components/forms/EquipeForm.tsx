@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface EquipeFormProps {
   onClose: () => void;
-  onSave: () => void;
+  onSave: (data: any) => void;
 }
 
 export function EquipeForm({ onClose, onSave }: EquipeFormProps) {
@@ -73,7 +73,7 @@ export function EquipeForm({ onClose, onSave }: EquipeFormProps) {
       }
 
       toast.success("Membro da equipe cadastrado com sucesso!");
-      onSave();
+      onSave(formData);
       onClose();
     } catch (error) {
       console.error('Error:', error);

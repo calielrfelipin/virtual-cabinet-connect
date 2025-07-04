@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface DemandaFormProps {
   onClose: () => void;
-  onSave: () => void;
+  onSave: (data: any) => void;
 }
 
 export function DemandaForm({ onClose, onSave }: DemandaFormProps) {
@@ -62,7 +62,7 @@ export function DemandaForm({ onClose, onSave }: DemandaFormProps) {
       }
 
       toast.success("Demanda cadastrada com sucesso!");
-      onSave();
+      onSave(formData);
       onClose();
     } catch (error) {
       console.error('Error:', error);

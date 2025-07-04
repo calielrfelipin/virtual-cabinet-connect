@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 interface CidadaoFormProps {
   onClose: () => void;
-  onSave: () => void;
+  onSave: (data: any) => void;
 }
 
 export function CidadaoForm({ onClose, onSave }: CidadaoFormProps) {
@@ -68,7 +68,7 @@ export function CidadaoForm({ onClose, onSave }: CidadaoFormProps) {
       }
 
       toast.success("Cidadão cadastrado com sucesso!");
-      onSave();
+      onSave(formData);
       onClose();
     } catch (error) {
       console.error('Error:', error);
